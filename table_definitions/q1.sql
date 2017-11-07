@@ -30,6 +30,7 @@ FROM election JOIN election_result ON election.id=election_id
 WHERE 1996 <= EXTRACT(YEAR FROM e_date) AND EXTRACT(YEAR FROM e_date) <= 2016;
 
 -- TODO: check why the number of null values increases from past_20 to party_votes_ratios by 62.
+-- TODO: double check the average done in the 2nd view.
 
 -- Get ratios.
 CREATE VIEW party_votes_ratios AS 
@@ -37,7 +38,7 @@ SELECT year, country.name as countryName, (cast(votes as decimal) / cast(votes_v
 FROM past_20 JOIN country ON country.id=country_id JOIN party ON party.id=party_id;
 
 CREATE VIEW avg_party_votes_ratios AS
-SELECT year, countryName, avg(voteRatio) as voteRatio, partyName
+SELECT year, countryName, sum(voteRatio) / cast(count(*) as decimal) as voteRatio, partyName
 FROM party_votes_ratios
 GROUP BY year, partyName, countryName;
 
@@ -69,9 +70,15 @@ FROM avg_party_votes_ratios
 WHERE 30 < voteRatio AND voteRatio <= 40;
 
 CREATE VIEW from40 AS 
-SELECT year, countryName, cast('(40+]' as VARCHAR(20))  as voteRange, partyName
+SELECT year, countryName, cast('(40-100]' as VARCHAR(20))  as voteRange, partyName
 FROM avg_party_votes_ratios
-WHERE 40 < voteRatio ;
+WHERE 40 < voteRatio;
+
+CREATE VIEW null_parties AS 
+SELECT year, countryName, cast('(40-100]' as VARCHAR(20))  as voteRange, partyName
+FROM avg_party_votes_ratios
+WHERE voteRatio IS null;
+
 
 -- Combining all the ranges together.
 CREATE VIEW allRanges AS
@@ -81,7 +88,8 @@ SELECT * FROM (
 (SELECT * FROM from10_20) UNION
 (SELECT * FROM from20_30) UNION
 (SELECT * FROM from30_40) UNION
-(SELECT * FROM from40)) AS from0_100;
+(SELECT * FROM from40) UNION
+(SELECT * FROM null_parties)) AS from0_100;
 
 -- the answer to the query
 insert into q1 (SELECT * FROM allRanges);

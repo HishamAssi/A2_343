@@ -72,7 +72,7 @@ GROUP BY party_id, country_id;
 
 -- Average number of wins per country i
 CREATE VIEW averagePerCountry AS
-SELECT party.country_id, avg(wonElections)
+SELECT party.country_id, (cast(sum(wonElections) as decimal) / count(*)) as avg
 FROM party LEFT JOIN winnerCount ON party.id = party_id
 GROUP BY party.country_id;
 
@@ -110,6 +110,6 @@ SELECT countryName, partyName, party_family.family as  partyFamily, wonElections
 FROM eligible_countrynames LEFT JOIN party_family on eligible_countrynames.party_id = party_family.party_id ;  
 
 -- the answer to the query 
-insert into q2 (SELECT * FROM eligible_familynames); 
+insert into q2 (SELECT * FROM eligible_familynames);
 
 
