@@ -19,13 +19,19 @@ DROP VIEW IF EXISTS current_cabinet CASCADE;
 
 -- Define views for your intermediate steps here.
 CREATE VIEW current_cabinet AS
-SELECT id as cabinetId, cabinet.start_date, null as end_date 
+SELECT country_id, id as cabinetId, cabinet.start_date, null as end_date, name 
 FROM (SELECT country_id, max(start_date) as start_date FROM cabinet GROUP BY country_id) AS max_years
 JOIN cabinet ON max_years.country_id = cabinet.country_id AND max_years.start_date=cabinet.start_date;
 
 CREATE VIEW previous_cabinets AS
-SELECT id as cabinetId, c1.start_date AS start_date, c2.start_date AS end_date 
+SELECT country_id, id as cabinetId, c1.start_date AS start_date, c2.start_date AS end_date, name 
 FROM cabinet c1 JOIN cabinet c2 ON c2.previous_cabinet_id=c1.id;
+
+CREATE VIEW all_cabinets AS
+(SELECT * FROM previous_cabinets)
+UNION
+(SELECT * FROM current_cabinet) 
+
 
 -- the answer to the query 
 insert into q6 
