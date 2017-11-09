@@ -34,12 +34,12 @@ WHERE b <= EXTRACT(YEAR FROM start_date) and EXTRACT(YEAR FROM start_date) <= e;
 
 -- Cabinets to previous
 CREATE VIEW  party_with_cab AS
-SELECT party_id, cabinet_party.cabinet_id, country_id
+SELECT DISTINCT party_id, cabinet_party.cabinet_id, country_id
 FROM cabinet_party JOIN cab_within_20 ON cabinet_party.cabinet_id = cab_within_20.cabinet_id;
 
 -- Best scenario is a party is in every cabinet (perfect scenario)
 CREATE VIEW party_with_every_cabinet AS
-SELECT party_id, cabinet_id, country_id
+SELECT DISTINCT party.id as party_id, cabinet_id, party.country_id
 FROM party JOIN cab_within_20 ON party.country_id = cab_within_20.country_id;
 
 -- Parties that have missed atleast one previous cabinet
@@ -48,7 +48,7 @@ CREATE VIEW rule_breakers AS
 
 -- Parties that have been with every cabinet in the past 20 years
 CREATE VIEW every_cabinet AS
-(SELECT party.id as party_id FROM party) EXCEPT (SELCET party_id FROM rule_breakers);
+(SELECT party_id FROM party_with_cab) EXCEPT (SELECT DISTINCT party_id FROM rule_breakers);
 
 -- the answer to the query 
 insert into q5 
