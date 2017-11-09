@@ -35,7 +35,7 @@ WHERE b <= EXTRACT(YEAR FROM start_date) and EXTRACT(YEAR FROM start_date) <= e;
 -- Cabinets to previous
 CREATE VIEW  party_with_cab AS
 SELECT party_id, cabinet_party.cabinet_id, country_id
-FROM cabinet_party LEFT JOIN cab_within_20 ON cabinet_party.cabinet_id = cab_within_20.cabinet_id;
+FROM cabinet_party JOIN cab_within_20 ON cabinet_party.cabinet_id = cab_within_20.cabinet_id;
 
 -- Best scenario is a party is in every cabinet (perfect scenario)
 CREATE VIEW party_with_every_cabinet AS
