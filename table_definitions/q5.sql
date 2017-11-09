@@ -39,7 +39,7 @@ FROM cabinet_party JOIN cab_within_20 ON cabinet_party.cabinet_id = cab_within_2
 
 -- Best scenario is a party is in every cabinet (perfect scenario)
 CREATE VIEW party_with_every_cabinet AS
-SELECT party_id, cabinet_id, country_id
+SELECT party.id as party_id, cabinet_id, party.country_id
 FROM party JOIN cab_within_20 ON party.country_id = cab_within_20.country_id;
 
 -- Parties that have missed atleast one previous cabinet
@@ -48,7 +48,21 @@ CREATE VIEW rule_breakers AS
 
 -- Parties that have been with every cabinet in the past 20 years
 CREATE VIEW every_cabinet AS
-(SELECT party.id as party_id FROM party) EXCEPT (SELCET party_id FROM rule_breakers);
+(SELECT party.id as party_id FROM party) EXCEPT (SELECT party_id FROM rule_breakers);
+
+CREATE VIEW party_and_country AS
+SELECT country.name as countryName, party.name as partyName, party_id
+FROM every_cabinet JOIN party ON party_id=party.id
+JOIN country ON party.country_id=country.id;
+
+CREATE VIEW party_and_family AS
+SELECT countryName, partyName, family AS partyFamily, party_and_country.party_id
+FROM party_and_country JOIN party_family ON party_and_country.party_id=party_family.party_id;
+
+CREATE VIEW all_info AS
+SELECT countryName, partyName, partyFamily, state_market AS stateMarket
+FROM party_and_family JOIN party_position ON party_and_family.party_id=party_position.party_id;
+  
 
 -- the answer to the query 
-insert into q5 
+insert into q5 (SELECT * FROM all_info);
