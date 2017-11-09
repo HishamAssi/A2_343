@@ -34,7 +34,7 @@ WHERE 1996 <= EXTRACT(YEAR FROM e_date) AND EXTRACT(YEAR FROM e_date) <= 2016;
 
 -- Get ratios.
 CREATE VIEW party_votes_ratios AS 
-SELECT year, country.name as countryName, (cast(votes as decimal) / cast(votes_valid as decimal))*100 as voteRatio, party.name as partyName
+SELECT year, country.name as countryName, (cast(votes as decimal) / cast(votes_valid as decimal))*100 as voteRatio, party.short_name as partyName
 FROM past_20 JOIN country ON country.id=country_id JOIN party ON party.id=party_id;
 
 CREATE VIEW avg_party_votes_ratios AS
