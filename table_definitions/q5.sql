@@ -50,5 +50,18 @@ CREATE VIEW rule_breakers AS
 CREATE VIEW every_cabinet AS
 (SELECT party_id FROM party_with_cab) EXCEPT (SELECT DISTINCT party_id FROM rule_breakers);
 
+CREATE VIEW party_and_country AS
+SELECT country.name as countryName, party.name as partyName, party_id
+FROM every_cabinet JOIN party ON party_id=party.id
+JOIN country ON party.country_id=country.id;
+
+CREATE VIEW party_and_family AS
+SELECT countryName, partyName, family AS partyFamily, party_and_country.party_id
+FROM party_and_country LEFT JOIN party_family ON party_and_country.party_id=party_family.party_id;
+
+CREATE VIEW all_info AS
+SELECT countryName, partyName, partyFamily, state_market AS stateMarket
+FROM party_and_family LEFT JOIN party_position ON party_and_family.party_id=party_position.party_id;
+
 -- the answer to the query 
-insert into q5 
+insert into q5 (SELECT * FROM all_info);
