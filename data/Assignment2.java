@@ -5,7 +5,7 @@ import java.util.List;
 // Remember that an important part of your mark is for doing as much in SQL (not Java) as you can.
 // Solutions that use only or mostly Java will not receive a high mark.
 public class Assignment2 extends JDBCSubmission {
-
+	
     public Assignment2() throws ClassNotFoundException {
 
         Class.forName("org.postgresql.Driver");
@@ -13,20 +13,41 @@ public class Assignment2 extends JDBCSubmission {
 
     @Override
     public boolean connectDB(String url, String username, String password) {
-        // Implement this method!
-        return false;
+    	
+    	try {
+    		connection = DriveManager.getConection(url, username, password);
+    		
+    	}
+    	catch (SQLException se) {
+    		System.err.println("SQL Exception." +
+                    "<Message>: " + se.getMessage());
+    		return false;
+    	}
+    	
+    	
+        return true;
     }
 
     @Override
     public boolean disconnectDB() {
+    	try {
+    		connection.close();
+    	}
+    	catch (SQLException se) {
+    		System.err.println("SQL Exception." +
+                    "<Message>: " + se.getMessage());
+    		return false;
+    	}
         // Implement this method!
-        return false;
+        return true;
     }
 
     @Override
     public ElectionCabinetResult electionSequence(String countryName) {
         // Implement this method!
-        return null;
+        
+    	
+    	return null;
     }
 
     @Override
