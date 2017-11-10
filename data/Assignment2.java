@@ -45,6 +45,22 @@ public class Assignment2 extends JDBCSubmission {
     @Override
     public ElectionCabinetResult electionSequence(String countryName) {
         // Implement this method!
+    	
+    	String queryCountryNames = "SELECT id FROM country WHERE name = ?";
+    	PreparedStatement getCountryName = connection.prepareStatement(queryCountryNames);
+    	getCountryName.setString(1, countryName);
+    	ResultSet country_id = getCountryName.executeQuery();
+    	
+    	int c_id;
+    	while(r.next()) {
+    		c_id = country_id.getInt("id");
+    	}
+    	
+    	
+    	String queryElections = "SELECT id FROM election WHERE country_id = ?";
+    	PreparedStatement getElections = connection.prepareStatement(queryElections);
+    	
+    	
         
     	
     	return null;
