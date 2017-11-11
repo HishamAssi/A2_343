@@ -1,0 +1,114 @@
+package a2;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+// If you are looking for Java data structures, these are highly useful.
+// Remember that an important part of your mark is for doing as much in SQL (not Java) as you can.
+// Solutions that use only or mostly Java will not receive a high mark.
+public class Assignment2 extends JDBCSubmission {
+	
+    public Assignment2() throws ClassNotFoundException {
+
+        Class.forName("org.postgresql.Driver");
+    }
+
+    @Override
+    public boolean connectDB(String url, String username, String password) {
+    	
+    	try {
+    		connection = DriverManager.getConnection(url, username, password);
+    		
+    	}
+    	catch (SQLException se) {
+    		System.err.println("SQL Exception." +
+                    "<Message>: " + se.getMessage());
+    	}
+    	
+    	
+        return true;
+    }
+
+    @Override
+    public boolean disconnectDB() {
+    	try {
+    		connection.close();
+    	}
+    	catch (SQLException se) {
+    		System.err.println("SQL Exception." +
+                    "<Message>: " + se.getMessage());
+    		return false;
+    	}
+        // Implement this method!
+        return true;
+    }
+
+    @Override
+    public ElectionCabinetResult electionSequence(String countryName) {
+        // Implement this method!
+        
+    	
+    	return null;
+    }
+
+    @Override
+    public List<String> findSimilarPoliticians(int politicianId, float threshold) {
+        
+    	String queryMainPolitician = "SELECT id, description, comment FROM politician_president WHERE id = ?";
+		try {
+			PreparedStatement getMainPolitician = connection.prepareStatement(queryMainPolitician);
+			getMainPolitician.setInt(1, politicianId);
+			ResultSet politicianInfo = getMainPolitician.executeQuery();
+			
+			String politicianDescription;
+			while(politicianInfo.next()){
+				politicianDescription = politicianInfo.getString("description");
+			}
+			
+			String queryOtherPoliticians = "SELECT description FROM politician_president WHERE id != ?";
+			PreparedStatement getOtherPoliticians = connection.prepareStatement(queryOtherPoliticians);
+			getOtherPoliticians.setInt(1, politicianId);
+			ResultSet otherPoliticianInfo = getOtherPoliticians.executeQuery();
+			
+			List<String> similarPoliticians = new ArrayList<String>();
+	  
+			while(otherPoliticianInfo.next()){
+				politicianDescription = politicianInfo.getString("description");
+				String otherPoliticianDescription = otherPoliticianInfo.getString("description");
+				String otherPoliticianComment = otherPoliticianInfo.getString("comment");
+				String otherPoliticianAll = otherPoliticianDescription + " " + otherPoliticianComment;
+				if (similarity(politicianDescription, otherPoliticianAll) > threshold){
+					similarPoliticians.add(otherPoliticianInfo.getString("id"));
+				}
+			}
+			return similarPoliticians;
+		}
+		catch (SQLException se) {
+			System.err.println("SQL Exception." +
+                    "<Message>: " + se.getMessage());
+    		return null;
+		}
+		
+    	
+    	
+    	
+        
+    }
+
+    public static void main(String[] args) {
+    	try {
+			Assignment2 lol = new Assignment2();
+			List<String> answer = lol.findSimilarPoliticians(9, (float) 0.25);
+			System.out.println(answer);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	
+        System.out.println("Hello");
+    }
+
+}
+

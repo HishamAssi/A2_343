@@ -1,0 +1,112 @@
+package a2;
+
+import java.sql.*;
+import java.util.List;
+
+// If you are looking for Java data structures, these are highly useful.
+// Remember that an important part of your mark is for doing as much in SQL (not Java) as you can.
+// Solutions that use only or mostly Java will not receive a high mark.
+public class Assignment2 extends JDBCSubmission {
+	
+    public Assignment2() throws ClassNotFoundException {
+
+        Class.forName("org.postgresql.Driver");
+    }
+
+    @Override
+    public boolean connectDB(String url, String username, String password) {
+    	
+    	try {
+    		connection = DriveManager.getConection(url, username, password);
+    		
+    	}
+    	catch (SQLException se) {
+    		System.err.println("SQL Exception." +
+                    "<Message>: " + se.getMessage());
+    	}
+    	
+    	
+        return true;
+    }
+
+    @Override
+    public boolean disconnectDB() {
+    	try {
+    		connection.close();
+    	}
+    	catch (SQLException se) {
+    		System.err.println("SQL Exception." +
+                    "<Message>: " + se.getMessage());
+    		return false;
+    	}
+        // Implement this method!
+        return true;
+    }
+
+    @Override
+    public ElectionCabinetResult electionSequence(String countryName) {
+        // Implement this method!
+    	
+    	String queryCountryNames = "SELECT id FROM country WHERE name = ?";
+    	PreparedStatement getCountryName = connection.prepareStatement(queryCountryNames);
+    	getCountryName.setString(1, countryName);
+    	ResultSet country_id = getCountryName.executeQuery();
+    	
+    	int c_id;
+    	while(country_id.next()) {
+    		c_id = country_id.getInt("id");
+    	}
+    	
+    	
+    	String queryElections = "SELECT id FROM election WHERE country_id = ?";
+    	PreparedStatement getElections = connection.prepareStatement(queryElections);
+    	
+    	
+        
+    	
+    	return null;
+    }
+
+    @Override
+    public List<String> findSimilarPoliticians(int politicianId, float threshold) {
+        
+    	// Get the politicianId's info.
+    	String queryMainPolitician = "SELECT name, description, comment FROM politician_president WHERE id = ?";
+    	PreparedStatement getMainPolitician = connection.prepareStatement(queryCountryNames);
+    	getMainPolitician.setInt(1, politicianId);
+    	ResultSet politicianInfo = getMainPolitician.executeQuery();
+    	
+    	String politicianDescription;
+    	while(politicianInfo.next()){
+    		politicianDescription = politicianInfo.getString("description");
+    	}
+    	
+    	String queryOtherPoliticians = "SELECT description FROM politician_president WHERE id != ?";
+    	PreparedStatement getOtherPoliticians = connection.prepareStatement(queryCountryNames);
+    	getOtherPolitician.setInt(1, politicianId);
+    	ResultSet otherPoliticianInfo = getOtherPolitician.executeQuery();
+    	
+    	List<String> similarPoliticians;
+  
+    	while(otherPoliticianInfo.next()){
+    		String otherPoliticianDescription = otherPoliticianInfo.getString("description");
+    		String otherPoliticianComment = otherPoliticianInfo.getString("comment");
+    		String otherPoliticianAll = otherPoliticianDescription + " " + otherPoliticianComment;
+    		if (similarity(politicianDescription, otherPoliticianDescription) > threshold){
+    			similarPoliticians.add(e);
+    		}
+    	}
+    	
+    	
+    	
+    	
+        return similarPoliticians;
+    }
+
+    public static void main(String[] args) {
+        // You can put testing code in here. It will not affect our autotester.
+        System.out.println("Hello");
+    }
+
+}
+
