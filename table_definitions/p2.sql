@@ -10,7 +10,7 @@ FROM election e1 JOIN election e2 ON e1.e_type = e2.e_type AND ((e2.id = e1.prev
 WHERE e1.country_id = 44;
 
 
-CREATE VIEW eligible_cab AS
+CREATE VIEW eligible_cab1 AS
 SELECT election_cabinets.id as cabinet_id, election as election_id,next, e_type, start_date as c_start, s_date, end_date
 FROM (SELECT * FROM next_dates JOIN cabinet ON next_dates.c_id = cabinet.country_id) election_cabinets
 WHERE election_cabinets.id IN 
@@ -20,6 +20,16 @@ WHERE election_cabinets.s_date <= cabinet.start_date
 AND election_cabinets.end_date > cabinet.start_date
 AND election_cabinets.country_id = cabinet.country_id
 );
+
+
+CREATE VIEW eligible_cab AS
+SELECT cabinet.id as cabinet_id, election as election_id,next, e_type, start_date as c_start, s_date, end_date
+FROM next_dates election_cabinets JOIN cabinet ON election_cabinets.c_id = cabinet.country_id
+WHERE election_cabinets.s_date <= cabinet.start_date 
+AND election_cabinets.end_date > cabinet.start_date
+AND election_cabinets.c_id = cabinet.country_id;
+
+
 
 -- Find the most recent election with no next
 CREATE VIEW most_recent_election_cab AS
