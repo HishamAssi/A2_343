@@ -56,31 +56,25 @@ public class Assignment2 extends JDBCSubmission {
 	int countryId = CountryId.getInt("id");
 	
 	
-        String queryElectionSequence = "(SELECT cabinet.id as cabinet_id, election as election_id FROM " +
-	"(SELECT e2.id as election, e1.id as next, e2.e_date as s_date, e1.e_date as end_date, e1.country_id as c_id, e1.e_type as e_type " + 
-	"FROM election e1 JOIN election e2 ON e1.e_type = e2.e_type AND ((e2.id = e1.previous_parliament_election_id ) OR (e2.id = e1.previous_ep_election_id)) AND e1.country_id = e2.country_id WHERE e2.country_id = ?) AS election_cabinets " +
-"JOIN cabinet ON election_cabinets.c_id = cabinet.country_id " +
-"WHERE election_cabinets.s_date <= cabinet.start_date " + 
-"AND election_cabinets.end_date >= cabinet.start_date) " +
-
-/*"UNION " +
-
-"(SELECT cabinet.id as cabinet_id, election.id as election_id " +
-"FROM election JOIN cabinet ON election.country_id = cabinet.country_id AND election.country_id = ? " +
-"WHERE ( " + 
-"election.e_date IN " +
-	"(SELECT max(e_date) as e_date " +
-	"FROM election " + 
-	"WHERE election.country_id = ? " +
-	"GROUP BY (e_type))) " +
-"AND (election.e_date <= cabinet.start_date)) " +*/
-
-"ORDER BY election_id DESC;";
+    String queryElectionSequence = "(SELECT cabinet.id as cabinet_id, election as election_id FROM " +
+	"(SELECT e2.id as election, e1.id as next, e2.e_date as s_date, e1.e_date as end_date, e1.country_id as c_id, " +
+	"e1.e_type as e_type FROM election e1 JOIN election e2 ON e1.e_type = e2.e_type AND ((e2.id = " +
+	"e1.previous_parliament_election_id ) OR (e2.id = e1.previous_ep_election_id)) AND e1.country_id = " +
+	"e2.country_id WHERE e2.country_id = ?) AS election_cabinets JOIN cabinet ON election_cabinets.c_id = " +
+	"cabinet.country_id WHERE election_cabinets.s_date <= cabinet.start_date " + 
+	"AND election_cabinets.end_date >= cabinet.start_date) " +
+	"UNION " +
+	"(SELECT cabinet.id as cabinet_id, election.id as election_id " +
+	"FROM election JOIN cabinet ON election.country_id = cabinet.country_id AND election.country_id = ? " +
+	"WHERE ( election.e_date IN (SELECT max(e_date) as e_date FROM election " + 
+	"WHERE election.country_id = ? GROUP BY (e_type))) " +
+	"AND (election.e_date <= cabinet.start_date)) " +
+	"ORDER BY election_id DESC;";
 
 	PreparedStatement getElectionSequence = connection.prepareStatement(queryElectionSequence);
 	getElectionSequence.setInt(1,countryId);
-	//getElectionSequence.setInt(2,countryId);
-	//getElectionSequence.setInt(3,countryId);
+	getElectionSequence.setInt(2,countryId);
+	getElectionSequence.setInt(3,countryId);
 
 	ResultSet election_sequence = getElectionSequence.executeQuery();
 	
