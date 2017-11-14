@@ -63,7 +63,8 @@ public class Assignment2 extends JDBCSubmission {
 	"FROM election e3 WHERE e3.e_type = 'Parliamentary election' GROUP BY e3.country_id) AND e2.e_date=e1.e_date) OR " + 
 	"(e1.e_date IN (SELECT max(e3.e_date) FROM election e3 WHERE e3.e_type = 'European Parliament' GROUP BY e3.country_id) " + 
 	"AND e2.e_date = e1.e_date)) AS e JOIN cabinet ON cabinet.country_id=e.country_id AND ((e.e_start <= cabinet.start_date " +
-	"AND cabinet.start_date < e.e_end) OR (e.e_start=e.e_end AND e.e_start <= cabinet.start_date)) WHERE e.country_id = ?;";
+	"AND cabinet.start_date < e.e_end) OR (e.e_start=e.e_end AND e.e_start <= cabinet.start_date)) WHERE e.country_id = ? ORDER " +
+	"BY e.e_start desc, cabinet.start_date asc;";
 
         /*"(SELECT cabinet.id as cabinet_id, election as election_id FROM " +
 	"(SELECT e2.id as election, e1.id as next, e2.e_date as s_date, e1.e_date as end_date, e1.country_id as c_id, e1.e_type as e_type " + 
