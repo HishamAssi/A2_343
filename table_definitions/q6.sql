@@ -19,6 +19,8 @@ DROP VIEW IF EXISTS current_cabinet CASCADE;
 DROP VIEW IF EXISTS previous_cabinets CASCADE;
 DROP VIEW IF EXISTS party_and_family_names CASCADE;
 
+
+-- INCLUDE ALL COUNTRIES REGARDLESS!
 -- Define views for your intermediate steps here.
 CREATE VIEW current_cabinet AS
 SELECT cabinet.country_id, id as cabinetId, cabinet.start_date, null as end_date, cabinet.name 

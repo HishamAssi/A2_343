@@ -31,24 +31,13 @@ DROP VIEW IF EXISTS eligiblePartiesWithElections;
 DROP VIEW IF EXISTS mostRecentElection;
 
 
--- Define views for your intermediate steps here.
-
-
--- ALL LOSERS
+-- Parties that did not win a specific election. 
 CREATE VIEW losingParties  AS 
 SELECT DISTINCT e1.election_id as election_id, e1.party_id as party_id 
 FROM election_result e1 JOIN election_result e2 ON 
 (e1.election_id = e2.election_id) and (e1.votes < e2.votes);
 
--- WINNING PARTY IDS
-CREATE VIEW winningParties1 AS
-(SELECT election_id, party_id
-FROM election_result)
-except
-(SELECT DISTINCT election_id, party_id
-FROM losingParties);
-
--- Winning parties approach 2
+-- Winning parties in an election.
 CREATE VIEW winningParties AS
 SELECT e1.election_id as election_id, e1.party_id as party_id 
 FROM election_result e1 INNER JOIN
@@ -57,37 +46,35 @@ FROM election_result
 GROUP BY election_id) e2
 ON e1.election_id = e2.election_id and e1.votes = e2.votes;
 
--- Winning parties to number of votes
+-- Winning parties with the number of votes received.
 CREATE VIEW winningPartiesWithVotes AS
 SELECT winningParties.election_id as election_id, winningParties.party_id as party_id, votes, country_id
 FROM (winningParties JOIN election_result ON winningParties.party_id = election_result.party_id and winningParties.election_id = election_result.election_id) JOIN party ON winningParties.party_id = party.id;
 
-
-
--- Number of wins by country party
+-- Number of wins for each party.
 CREATE VIEW winnerCount AS
 SELECT party_id, count(*) as wonElections, country_id 
 FROM winningParties JOIN party ON winningParties.party_id = party.id 
 GROUP BY party_id, country_id;
 
--- Average number of wins per country i
+-- Average number of wins for each country.
 CREATE VIEW averagePerCountry AS
 SELECT party.country_id, (cast(sum(wonElections) as decimal) / count(*)) as avg
 FROM party LEFT JOIN winnerCount ON party.id = party_id
 GROUP BY party.country_id;
 
--- Parties with wins more than 3 times the average
+-- Parties with wins more than 3 times the average of their country's wins.
 CREATE VIEW eligibleParties AS
 SELECT party_id,wonElections,  averagePerCountry.avg
 FROM averagePerCountry JOIN winnerCount ON averagePerCountry.country_id = winnerCount.country_id
 WHERE wonElections > 3* averagePerCountry.avg;
 
--- Parties with election wins
+-- All eligible parties with all elections that they have won. 
 CREATE VIEW eligiblePartiesWithElections AS
 SELECT eligibleParties.party_id as party_id, wonElections,election_id, e_date 
 FROM (winningParties JOIN eligibleParties ON winningParties.party_id = eligibleParties.party_id) JOIN election ON id = election_id;
 
--- Most recent election won
+-- All eligible parties with the most recent election won.
 CREATE VIEW mostRecentElection as
 SELECT e1.party_id as party_id, e1.wonElections as wonElections, e1.election_id as MostRecentlyWonElectionId, EXTRACT( YEAR from e1.e_date) as MostRecentlyWonElectionYear
 FROM eligiblePartiesWithElections e1 INNER JOIN
@@ -96,15 +83,17 @@ FROM eligiblePartiesWithElections
 GROUP BY party_id) e2
 ON e1.party_id = e2.party_id and e1.e_date = e2.e_date;
 
--- Needed information for answer
+-- All eligible parties with needed information.
 CREATE VIEW eligible_names AS
 SELECT party.country_id, party.name as partyName,mostRecentElection.party_id,  wonElections, mostRecentlyWonElectionId, mostRecentlyWonElectionYear
 FROM mostRecentElection JOIN party ON party.id = party_id; 
 
+-- All eligible parties with even more information.
 CREATE VIEW eligible_countrynames AS
 SELECT country.name as countryName, partyName,party_id,  wonElections, mostRecentlyWonElectionId, mostRecentlyWonElectionYear
 FROM eligible_names  JOIN country ON eligible_names.country_id = country.id ;  
 
+-- All relevant information for all eligible parties as per the question specifications.
 CREATE VIEW eligible_familynames AS
 SELECT countryName, partyName, party_family.family as  partyFamily, wonElections, mostRecentlyWonElectionId, mostRecentlyWonElectionYear
 FROM eligible_countrynames LEFT JOIN party_family on eligible_countrynames.party_id = party_family.party_id ;  

@@ -5,8 +5,8 @@ DROP VIEW IF EXISTS all_resultsOfficial CASCADE;
 DROP VIEW IF EXISTS country_id CASCADE; 
  
 
-DROP TABLE IF EXISTS electionD CASCADE;
-DROP TABLE IF EXISTS cabinetD CASCADE;
+DROP TABLE IF EXISTS election CASCADE;
+DROP TABLE IF EXISTS cabinet CASCADE;
 -- Get the country_id from the name
 
  -- A "cabinet" is the set of government and opposition parties in parliament
@@ -14,7 +14,7 @@ DROP TABLE IF EXISTS cabinetD CASCADE;
 -- This table itself stores the start date of a cabinet and other general 
 -- information it.  Table cabinet_party, which references this table,
 -- stores the political parties that were part of this cabinet.
-CREATE TABLE cabinetD(
+CREATE TABLE cabinet(
   id INT PRIMARY KEY,
   -- The country in which this cabinet occurred.
   country_id INT REFERENCES country(id),
@@ -25,19 +25,19 @@ CREATE TABLE cabinetD(
 
 -- Election results for a parliamentary election or European parliament
 -- election.  European parliament elections are recorded here by country.
-CREATE TABLE electionD(
+CREATE TABLE election(
   id INT primary key,
   -- The country whose election information this is.
   country_id INT REFERENCES country(id),
   -- The date of this election.
   e_date INT  NOT NULL,
-  previous_parliament_election_id INT REFERENCES electionD(id),
+  previous_parliament_election_id INT REFERENCES election(id),
   -- ID of the previous EP election in this country, or
   -- NULL if there is no previous EP election in the database.
   -- Note: Even parliamentary elections have this attribute.
   -- Constraint: The country_id for this election and the previous
   -- EP election must be the same.
-  previous_ep_election_id INT REFERENCES electionD(id),
+  previous_ep_election_id INT REFERENCES election(id),
   -- The type of election this was.
   e_type VARCHAR(200) NOT NULL 
 );
