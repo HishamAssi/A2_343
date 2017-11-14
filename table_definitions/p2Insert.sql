@@ -43,7 +43,7 @@ CREATE TABLE election(
 );
 
 
-INSERT into election VALUES (3, 29, 2017-10-1,2, NULL,'Parliamentary election'), (2, 29, 1990-10-1,1, NULL, 'Parliamentary election'), (1, 29, 1920-10-1, NULL, NULL, 'Parliamentary election');
+INSERT INTO election VALUES (3, 29, 2017-10-1,2, NULL,'Parliamentary election'), (2, 29, 1990-10-1,1, NULL, 'Parliamentary election'), (1, 29, 1920-10-1, NULL, NULL, 'Parliamentary election');
 INSERT INTO cabinet VALUES (3,29,2017-10-1), (2, 29, 1990-10-1), (1, 29, 1920-10-1);
 
 

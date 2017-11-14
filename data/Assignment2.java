@@ -61,7 +61,7 @@ public class Assignment2 extends JDBCSubmission {
 	"country_id  FROM election e1 LEFT JOIN election e2 ON e1.e_type = e2.e_type AND e1.country_id = e2.country_id " + 
 	"AND ((e1.id = e2.previous_parliament_election_id) OR (e1.id = e2.previous_ep_election_id))) AS e " +
 	"LEFT JOIN cabinet ON cabinet.country_id = e.country_id AND ((cabinet.start_date >= e.e_start AND " + 
-	"cabinet.start_date <=e.e_end) OR (cabinet.start_date >= e.e_start AND e.e_end is NULL )) where (e.country_id = ?);";
+	"cabinet.start_date <e.e_end) OR (cabinet.start_date >= e.e_start AND e.e_end is NULL )) where (e.country_id = ?);";
 
         /*"(SELECT cabinet.id as cabinet_id, election as election_id FROM " +
 	"(SELECT e2.id as election, e1.id as next, e2.e_date as s_date, e1.e_date as end_date, e1.country_id as c_id, e1.e_type as e_type " + 
@@ -160,7 +160,7 @@ public class Assignment2 extends JDBCSubmission {
 					"assihis1", "");
 
 			List<Integer> similarPoliticians = test.findSimilarPoliticians(148, (float) 0.01);
-			ElectionCabinetResult election_result = test.electionSequence("Japan");
+			ElectionCabinetResult election_result = test.electionSequence("Canada");
 			System.out.println(election_result.elections  + "size: " + election_result.elections.size());
 			System.out.println(election_result.cabinets);
 			System.out.println(similarPoliticians);
