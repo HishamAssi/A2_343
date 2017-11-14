@@ -43,7 +43,7 @@ CREATE TABLE election(
 );
 
 
-INSERT INTO election VALUES (3, 29, 2017-10-1,2, NULL,'p'), (2, 29, 1990-10-1,1, NULL, 'p'), (1, 29, 1920-10-1, NULL, NULL, 'p');
+INSERT INTO election VALUES (3, 29, 2017-10-1,2, NULL,'Parliamentary election'), (2, 29, 1990-10-1,1, NULL, 'Parliamentary election'), (1, 29, 1920-10-1, NULL, NULL, 'Parliamentary election');
 INSERT INTO cabinet VALUES (3,29,2017-10-1), (2, 29, 1990-10-1), (1, 29, 1920-10-1);
 
 
@@ -56,7 +56,9 @@ WHERE name='Japan';
 CREATE VIEW all_results AS
 SELECT e.election_id as election_id, cabinetD.id as cabinet_id
 FROM (SELECT e1.e_date as e_start, e2.e_date as e_end, e1.id as election_id, e1.country_id as country_id  FROM electionD e1 LEFT JOIN electionD e2 ON e1.e_type = e2.e_type AND e1.country_id = e2.country_id AND ((e1.id = e2.previous_parliament_election_id) OR (e1.id = e2.previous_ep_election_id))) AS e
-LEFT JOIN cabinetD ON cabinetD.country_id = e.country_id AND ((cabinetD.start_date >= e.e_start AND cabinetD.start_date <=e.e_end) OR (cabinetD.start_date >= e.e_start AND e.e_end is NULL )) 
+LEFT JOIN cabinetD ON cabinetD.country_id = e.country_id 
+AND ((cabinetD.start_date >= e.e_start AND cabinetD.start_date <e.e_end) 
+OR (cabinetD.start_date >= e.e_start AND e.e_end is NULL )) 
 where (e.country_id = 29);
 
 CREATE VIEW all_resultsOfficial AS
