@@ -61,7 +61,7 @@ public class Assignment2 extends JDBCSubmission {
 "FROM election e1 LEFT JOIN election e2 ON e1.e_type = e2.e_type AND e1.country_id = e2.country_id AND ((e1.id " +
 "= e2.previous_parliament_election_id) OR (e1.id = e2.previous_ep_election_id))) AS e " +
 "JOIN cabinet ON cabinet.country_id = e.country_id WHERE ((cabinet.start_date >= " +
-"e.e_start AND cabinet.start_date <= e.e_end) OR (cabinet.start_date >= e.e_start AND e.e_end is NULL )) AND " +
+"e.e_start AND cabinet.start_date < e.e_end) OR (cabinet.start_date >= e.e_start AND e.e_end is NULL )) AND " +
 "(e.country_id = ?) ORDER BY e_start desc, cabinet.start_date desc;";
 
         /*"(SELECT cabinet.id as cabinet_id, election as election_id FROM " +
