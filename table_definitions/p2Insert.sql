@@ -1,8 +1,9 @@
 SET SEARCH_PATH TO parlgov;
 
 DROP VIEW IF EXISTS all_results CASCADE;
+DROP VIEW IF EXISTS all_resultsOfficial CASCADE;
 DROP VIEW IF EXISTS country_id CASCADE; 
-DROP VIEW IF EXISTS election_pair CASCADE; 
+ 
 
 DROP TABLE IF EXISTS electionD CASCADE;
 DROP TABLE IF EXISTS cabinetD CASCADE;
@@ -42,8 +43,8 @@ CREATE TABLE electionD(
 );
 
 
-INSERT into electionD VALUES (3, 29, 2017,2, NULL,'p'), (2, 29, 1990,1, NULL, 'p'), (1, 29, 1920, NULL, NULL, 'p');
-INSERT INTO cabinetD VALUES (3,29,2017), (2, 29, 2017), (1, 29, 1920);
+INSERT into electionD VALUES (3, 29, 2018,2, 1,'e'), (2, 29, 1990,1, NULL, 'p'), (1, 29, 1920, NULL, NULL, 'p');
+INSERT INTO cabinetD VALUES (3,5,2017), (2, 29, 2017), (1, 29, 1920);
 
 
 CREATE VIEW Country_id AS
@@ -55,12 +56,11 @@ WHERE name='Japan';
 CREATE VIEW all_results AS
 SELECT e.election_id as election_id, cabinetD.id as cabinet_id
 FROM (SELECT e1.e_date as e_start, e2.e_date as e_end, e1.id as election_id, e1.country_id as country_id  FROM electionD e1 LEFT JOIN electionD e2 ON e1.e_type = e2.e_type AND e1.country_id = e2.country_id AND ((e1.id = e2.previous_parliament_election_id) OR (e1.id = e2.previous_ep_election_id))) AS e
-JOIN cabinetD ON cabinetD.country_id = e.country_id
-WHERE ((cabinetD.start_date >= e.e_start AND cabinetD.start_date <=e.e_end) OR (cabinetD.start_date >= e.e_start AND e.e_end is NULL )) AND (e.country_id = 29);
+LEFT JOIN cabinetD ON cabinetD.country_id = e.country_id AND ((cabinetD.start_date >= e.e_start AND cabinetD.start_date <=e.e_end) OR (cabinetD.start_date >= e.e_start AND e.e_end is NULL )) 
+where (e.country_id = 29);
 
-CREATE VIEW election_pair AS
-SELECT e1.e_date as e_start, e1.e_type as e1,  e2.e_date as e_end,e2.e_type as e2, e1.id as election_id, e1.country_id as country_id  
-FROM electionD e1 LEFT JOIN electionD e2 ON e1.e_type = e2.e_type AND e1.country_id = e2.country_id AND ((e1.id = e2.previous_parliament_election_id) OR (e1.id = e2.previous_ep_election_id))
-WHERE e1.country_id = 29;
- 
-
+CREATE VIEW all_resultsOfficial AS
+SELECT e.election_id as election_id, cabinet.id as cabinet_id
+FROM (SELECT e1.e_date as e_start, e2.e_date as e_end, e1.id as election_id, e1.country_id as country_id  FROM election e1 LEFT JOIN election e2 ON e1.e_type = e2.e_type AND e1.country_id = e2.country_id AND ((e1.id = e2.previous_parliament_election_id) OR (e1.id = e2.previous_ep_election_id))) AS e
+LEFT JOIN cabinet ON cabinet.country_id = e.country_id AND ((cabinet.start_date >= e.e_start AND cabinet.start_date <=e.e_end) OR (cabinet.start_date >= e.e_start AND e.e_end is NULL )) 
+where (e.country_id = 5);
