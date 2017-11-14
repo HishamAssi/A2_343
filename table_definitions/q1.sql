@@ -37,28 +37,36 @@ CREATE VIEW party_votes_ratios AS
 SELECT year, country.name as countryName, (cast(votes as decimal) / cast(votes_valid as decimal))*100 as voteRatio, party.name_short as partyName
 FROM past_20 JOIN country ON country.id=country_id JOIN party ON party.id=party_id;
 
+-- Average the ratios if more than one election occured in a year.
 CREATE VIEW avg_party_votes_ratios AS
 SELECT year, countryName, sum(voteRatio) / cast(count(*) as decimal) as voteRatio, partyName
 FROM party_votes_ratios
 GROUP BY year, partyName, countryName;
 
+
 -- For the next 6 views, I will be creating a different view for the different 
 -- ranges to include the ranges in the views.
+-- This view is for the range of 0 exclusive to 5 inclusive.
 CREATE VIEW from0_5 AS 
 SELECT year, countryName, cast('(0-5]' as VARCHAR(20)) as voteRange, partyName
 FROM avg_party_votes_ratios
 WHERE 0 < voteRatio AND voteRatio <= 5;
 
+-- This view is for the range of 5 exclusive to 10 inclusive.
 CREATE VIEW from5_10 AS 
 SELECT year, countryName, cast('(5-10]' as VARCHAR(20)) as voteRange, partyName
 FROM avg_party_votes_ratios
 WHERE 5 < voteRatio AND voteRatio <= 10;
 
+
+-- This view is for the range of 10 exclusive to 20 inclusive.
 CREATE VIEW from10_20 AS 
 SELECT year, countryName, cast('(10-20]' as VARCHAR(20)) as voteRange, partyName
 FROM avg_party_votes_ratios
 WHERE 10 < voteRatio AND voteRatio <= 20;
 
+
+-- This view is for the range of 20 exclusive to 30 inclusive.
 CREATE VIEW from20_30 AS 
 SELECT year, countryName, cast('(20-30]' as VARCHAR(20)) as voteRange, partyName
 FROM avg_party_votes_ratios
