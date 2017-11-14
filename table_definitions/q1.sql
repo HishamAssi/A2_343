@@ -83,10 +83,11 @@ FROM avg_party_votes_ratios
 WHERE 40 < voteRatio;
 
 CREATE VIEW null_parties AS 
-SELECT year, countryName, cast('(40-100]' as VARCHAR(20))  as voteRange, partyName
+SELECT year, countryName, NULL  as voteRange, partyName
 FROM avg_party_votes_ratios
 WHERE voteRatio IS null;
 
+-- TODO :  null VOTES?
 
 -- Combining all the ranges together.
 CREATE VIEW allRanges AS
