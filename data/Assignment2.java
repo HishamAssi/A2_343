@@ -56,7 +56,7 @@ public class Assignment2 extends JDBCSubmission {
 	int countryId = CountryId.getInt("id");
 	
 	
-	String queryElectionSequence = "SELECT e.election_id, cabinet.id FROM (SELECT e1.e_date as e_start, " +
+	String queryElectionSequence = "SELECT e.election_id, cabinet.id as cabinet_id FROM (SELECT e1.e_date as e_start, " +
 	"e2.e_date as e_end, e1.id as election_id, e1.country_id as country_id  FROM election e1, election e2 WHERE " + 
 	"e1.country_id = e2.country_id AND (e1.id = e2.previous_parliament_election_id AND e1.e_type = 'Parliamentary " + 
 	"election' AND e2.e_type = 'Parliamentary election') OR (e1.id = e2.previous_ep_election_id AND " + 
