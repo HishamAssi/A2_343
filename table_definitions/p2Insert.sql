@@ -19,7 +19,7 @@ CREATE TABLE cabinet(
   -- The country in which this cabinet occurred.
   country_id INT REFERENCES country(id),
   -- The date on which this cabinet came into being.
-  start_date INT  NOT NULL
+  start_date DATE  NOT NULL
   -- A label for this cabinet, consisting of the family name of the
 );
 
@@ -30,7 +30,7 @@ CREATE TABLE election(
   -- The country whose election information this is.
   country_id INT REFERENCES country(id),
   -- The date of this election.
-  e_date INT  NOT NULL,
+  e_date DATE NOT NULL,
   previous_parliament_election_id INT REFERENCES election(id),
   -- ID of the previous EP election in this country, or
   -- NULL if there is no previous EP election in the database.
@@ -43,8 +43,8 @@ CREATE TABLE election(
 );
 
 
-INSERT INTO election VALUES (3, 29, 2017-10-1,2, NULL,'Parliamentary election'), (2, 29, 1990-10-1,1, NULL, 'Parliamentary election'), (1, 29, 1920-10-1, NULL, NULL, 'Parliamentary election');
-INSERT INTO cabinet VALUES (3,29,2017-10-1), (2, 29, 1990-10-1), (1, 29, 1920-10-1);
+INSERT INTO election VALUES (3, 29, to_date('2017-10-1', 'YYYY-MM-DD'),2, 1,'Parliamentary election'), (2, 29, to_date('2013-10-1', 'YYYY-MM-DD'),1, 1, 'Parliamentary election'), (1, 29, to_date('2010-10-1', 'YYYY-MM-DD'), NULL, NULL, 'Parliamentary election');
+INSERT INTO cabinet VALUES (3,29,to_date('2017-10-1', 'YYYY-MM-DD')), (2, 29, to_date('2013-10-1', 'YYYY-MM-DD')), (1, 29, to_date('2010-10-1', 'YYYY-MM-DD'));
 
 
 CREATE VIEW Country_id AS
@@ -63,6 +63,8 @@ where (e.country_id = 29);
 
 CREATE VIEW all_resultsOfficial AS
 SELECT e.election_id as election_id, cabinet.id as cabinet_id
-FROM (SELECT e1.e_date as e_start, e2.e_date as e_end, e1.id as election_id, e1.country_id as country_id  FROM election e1 LEFT JOIN election e2 ON e1.e_type = e2.e_type AND e1.country_id = e2.country_id AND ((e1.id = e2.previous_parliament_election_id) OR (e1.id = e2.previous_ep_election_id))) AS e
+FROM (SELECT e1.e_date as e_start, e2.e_date as e_end, e1.id as election_id, e1.country_id as country_id  FROM election e1
+LEFT JOIN election e2 ON e1.e_type = e2.e_type AND e1.country_id = e2.country_id AND ((e1.id = e2.previous_parliament_election_id AND e1.e_type='Parliamentary election' AND e2.e_type='Parliamentary election')
+OR (e1.id = e2.previous_ep_election_id AND e1.e_type='European Parliament' AND e2.e_type='European Parliament'))) AS e
 LEFT JOIN cabinet ON cabinet.country_id = e.country_id AND ((cabinet.start_date >= e.e_start AND cabinet.start_date <=e.e_end) OR (cabinet.start_date >= e.e_start AND e.e_end is NULL )) 
-where (e.country_id = 5);
+where (e.country_id = 29);
