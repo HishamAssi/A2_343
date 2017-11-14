@@ -11,7 +11,7 @@ countryName VARCHAR(50),
 voteRange VARCHAR(20),
 partyName VARCHAR(100)
 );
-
+-- NO NULLS!!!
 -- Dropping the views that I'm about to create first just in case
 DROP VIEW IF EXISTS past_20 CASCADE;
 DROP VIEW IF EXISTS party_votes_ratios CASCADE;
@@ -72,16 +72,20 @@ SELECT year, countryName, cast('(20-30]' as VARCHAR(20)) as voteRange, partyName
 FROM avg_party_votes_ratios
 WHERE 20 < voteRatio AND voteRatio <= 30;
 
+
+-- This view is for the range of 30 exclusive to 40 inclusive.
 CREATE VIEW from30_40 AS 
 SELECT year, countryName, cast('(30-40]' as VARCHAR(20)) as voteRange, partyName
 FROM avg_party_votes_ratios
 WHERE 30 < voteRatio AND voteRatio <= 40;
 
+-- This view is for the range of 40 onwards.
 CREATE VIEW from40 AS 
 SELECT year, countryName, cast('(40-100]' as VARCHAR(20))  as voteRange, partyName
 FROM avg_party_votes_ratios
 WHERE 40 < voteRatio;
 
+-- This view consists of all the parties that did not have a voteRange.
 CREATE VIEW null_parties AS 
 SELECT year, countryName, cast('(40-100]' as VARCHAR(20))  as voteRange, partyName
 FROM avg_party_votes_ratios

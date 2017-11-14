@@ -42,8 +42,8 @@ CREATE TABLE electionD(
 );
 
 
-INSERT into electionD VALUES (3, 29, 2017,2, NULL,'p'), (2, 29, 1990,1, NULL, 'p'), (1, 29, 1920, NULL, NULL, 'p');
-INSERT INTO cabinetD VALUES (3,29,2017), (2, 29, 2017), (1, 29, 1920);
+INSERT into election VALUES (3, 29, 2017-10-1,2, NULL,'Parliamentary election'), (2, 29, 1990-10-1,1, NULL, 'Parliamentary election'), (1, 29, 1920-10-1, NULL, NULL, 'Parliamentary election');
+INSERT INTO cabinet VALUES (3,29,2017-10-1), (2, 29, 1990-10-1), (1, 29, 1920-10-1);
 
 
 CREATE VIEW Country_id AS
@@ -62,5 +62,4 @@ CREATE VIEW election_pair AS
 SELECT e1.e_date as e_start, e1.e_type as e1,  e2.e_date as e_end,e2.e_type as e2, e1.id as election_id, e1.country_id as country_id  
 FROM electionD e1 LEFT JOIN electionD e2 ON e1.e_type = e2.e_type AND e1.country_id = e2.country_id AND ((e1.id = e2.previous_parliament_election_id) OR (e1.id = e2.previous_ep_election_id))
 WHERE e1.country_id = 29;
- 
 
