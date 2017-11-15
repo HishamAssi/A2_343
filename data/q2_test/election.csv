@@ -1,0 +1,10 @@
+id,country_id,e_date,wikipedia,seats_total,electorate,votes_cast,votes_valid,description,previous_parliament_election_id,previous_ep_election_id,e_type
+1,54,2016-12-3,,1000,1000,,100,,,,Parliamentary election
+2,54,2016-12-2,,1000,1000,,100,,,,Parliamentary election
+3,54,2014-12-3,,1000,1000,,100,,,,Parliamentary election
+4,54,2013-12-3,,1000,1000,,100,,,,Parliamentary election
+5,54,2013-12-5,,1000,1000,,100,,,,Parliamentary election
+6,29,2013-12-4,,1000,1000,,100,,,,Parliamentary election
+7,29,2013-12-3,,1000,1000,,100,,,,Parliamentary election
+8,29,2013-12-2,,1000,1000,,100,,,,Parliamentary election
+9,29,2013-12-1,,1000,1000,,100,,,,Parliamentary election
