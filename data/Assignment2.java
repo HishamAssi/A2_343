@@ -57,6 +57,13 @@ public class Assignment2 extends JDBCSubmission {
 	
 	/* This query returns 2 columns election id and cabinet id where the cabinet id's
 	date falls in between the start date of election id and the end date of election id.
+	* We first find the ranges of each election to the next of its same type in order to 
+    use the start date.
+	* We then find all the cabinets that have a start date greater than   	
+	or equal to the start date of this election, and less than the end date. 
+	* If an election is the most recent one and has no end date, we only include the
+	combination of it with cabinets that started after the start date of this most recents
+	election(s).
 	*/
 	String queryElectionSequence = "SELECT e.election_id, cabinet.id as cabinet_id " +
 		"FROM (SELECT e1.e_date as e_start, e2.e_date as e_end, e1.id as election_id, " +
@@ -91,7 +98,8 @@ public class Assignment2 extends JDBCSubmission {
 	
 	List<Integer> elections = new ArrayList<Integer>();
 	List<Integer> cabinets = new ArrayList<Integer>();
-
+	
+	// Retrieve the tuples from the election sequence query
 	while(election_sequence.next()) {
 		elections.add(election_sequence.getInt("election_id") );
 		cabinets.add(election_sequence.getInt("cabinet_id"));
@@ -109,18 +117,20 @@ public class Assignment2 extends JDBCSubmission {
     public List<Integer> findSimilarPoliticians(Integer politicianId, Float threshold) {
     	
 		try {
+		    // Retrieve the comment and description of the input politician that we are comparing against.
 			String queryMainPolitician = "SELECT id, description, comment FROM politician_president WHERE id = ?";
 			PreparedStatement getMainPolitician = connection.prepareStatement(queryMainPolitician);
 			getMainPolitician.setInt(1, politicianId);
 			ResultSet politicianInfo = getMainPolitician.executeQuery();
 			
+			// Store the extracted information into structure for use in the following query
 			politicianInfo.next();
 			String politicianDescription = politicianInfo.getString("description");
 			String politicianComment = politicianInfo.getString("comment");
 			String politicianAll = politicianDescription + " " + politicianComment;
 			
-			//System.out.println("politian all: " + politicianAll);
-
+			
+			// Get all the politicians, comments, and descriptions of those other than the input politicianId
 			String queryOtherPoliticians = "SELECT id, description, comment FROM politician_president WHERE id != ?";
 			PreparedStatement getOtherPoliticians = connection.prepareStatement(queryOtherPoliticians);
 			getOtherPoliticians.setInt(1, politicianId);
@@ -128,7 +138,8 @@ public class Assignment2 extends JDBCSubmission {
 			
 			List<Integer> similarPoliticians = new ArrayList<Integer>();
 
-	  
+	 		//Compare the similarity of each politician's comments and descriptions to the input one
+			// Only include politicians whose similarity exceeds the given threshold.
 			while(otherPoliticianInfo.next()){
 				String otherPoliticianDescription = otherPoliticianInfo.getString("description");
 				String otherPoliticianComment = otherPoliticianInfo.getString("comment");

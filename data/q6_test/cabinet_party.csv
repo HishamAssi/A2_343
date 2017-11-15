@@ -1,5 +1,5 @@
 id,cabinet_id,party_id,pm,description
-1,1,1,t,
+1,1,1,f,
 2,1,2,f,
 3,2,1,f,
 4,2,2,t,

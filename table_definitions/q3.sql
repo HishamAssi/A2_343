@@ -19,7 +19,7 @@ DROP VIEW IF EXISTS participation_ratio CASCADE;
 DROP VIEW IF EXISTS rule_breakers CASCADE;
 
 
--- All the elections that occured in the past 15 years. The table view contain country_id, 
+-- All the elections that occured in the past 15 years [2001,2016]. The table view contain country_id, 
 -- year of the election, the number electorate and the number of votes cast.
 CREATE VIEW past_15 AS 
 SELECT country_id, EXTRACT(YEAR FROM e_date) as Year, electorate, votes_cast

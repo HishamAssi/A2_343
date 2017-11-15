@@ -29,8 +29,6 @@ SELECT EXTRACT(YEAR FROM e_date) as year, election.id as e_id, country_id, party
 FROM election JOIN election_result ON election.id=election_id 
 WHERE 1996 <= EXTRACT(YEAR FROM e_date) AND EXTRACT(YEAR FROM e_date) <= 2016;
 
--- TODO: check why the number of null values increases from past_20 to party_votes_ratios by 62.
--- TODO: double check the average done in the 2nd view.
 
 -- The percentage participation of a party in a single election.
 CREATE VIEW party_votes_ratios AS 
@@ -87,7 +85,7 @@ SELECT year, countryName, cast('(40-100]' as VARCHAR(20))  as voteRange, partyNa
 FROM avg_party_votes_ratios
 WHERE 40 < voteRatio;
 
--- TODO :  null VOTES?
+-- We will not be including parties with NULL votes (as discussed witj Prof Sina at Office Hours)  
 
 -- Combining all the ranges together.
 CREATE VIEW allRanges AS

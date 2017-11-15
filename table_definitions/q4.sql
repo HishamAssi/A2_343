@@ -57,7 +57,7 @@ ON party_position.party_id=country_and_party.party_id;
 -- left right parties in each range wanted.
 
 -- The number of parties that have a left_right position in [0-2)
--- Excludes countries with no parties containing a left_right position
+-- Excludes countries with no parties containing a left_right position 
 -- in that range. 
 CREATE VIEW r0_2_without0 AS
 SELECT countryName, count(*) as r0_2
@@ -153,16 +153,17 @@ CREATE VIEW r0_4 AS
 SELECT r0_2.countryName as countryName, r0_2, r2_4 
 FROM r0_2 JOIN r2_4 ON r0_2.countryName=r2_4.countryName;
 
--- The next 4 views are similar to the previous one, they are just to add all the columns
--- next to each other.
+-- Combine the views r0_4 with r4_6 so we have these three ranges in one table
 CREATE VIEW r0_6 AS
 SELECT r0_4.countryName as countryName, r0_2, r2_4, r4_6 
 FROM r0_4 JOIN r4_6 ON r0_4.countryName=r4_6.countryName;
 
+-- Combine the views r0_6 with r6_8 so we have these three ranges in one table
 CREATE VIEW r0_8 AS
 SELECT r0_6.countryName as countryName, r0_2, r2_4, r4_6, r6_8
 FROM r0_6 JOIN r6_8 ON r0_6.countryName=r6_8.countryName;
 
+-- Combine the views r0_8 with r8_10 so we have these three ranges in one table
 CREATE VIEW r0_10 AS
 SELECT r0_8.countryName as countryName, r0_2, r2_4, r4_6, r6_8, r8_10
 FROM r0_8 JOIN r8_10 ON r0_8.countryName=r8_10.countryName;

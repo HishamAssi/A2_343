@@ -24,7 +24,7 @@ GROUP BY country.id;
 
 
 -- This view contains all pairs of parties that were part of the same alliance in
--- an election.
+-- an election, avoiding symmetric pairs.
 CREATE VIEW allied_parties AS
 SELECT e1.party_id as alliedPartyId1, e2.party_id as alliedPartyId2
 FROM election_result e1 JOIN election_result e2 ON
