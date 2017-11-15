@@ -1,0 +1,7 @@
+id,election_id,party_id,alliance_id,seats,votes,description
+1,1,1,,,20,
+2,2,1,,,20,
+3,2,2,,,40,
+4,3,4,,,70,
+5,4,4,,,90,
+6,1,2,,,,

@@ -1,0 +1,10 @@
+id,country_id,start_date,name,wikipedia,description,comment,previous_cabinet_id,previous_parliament_election_id
+1,54,2010-12-2,c1,,,,,
+2,54,2009-12-1,c2,,,,,
+3,29,2010-12-5,c3,,,,,
+4,29,2009-12-1,c4,,,,,
+5,29,2009-12-2,c5,,,,,
+6,29,2009-12-3,c6,,,,,
+7,29,2008-12-2,c7,,,,,
+8,29,2010-12-3,c8,,,,,
+9,29,1940-12-3,c9,,,,,
