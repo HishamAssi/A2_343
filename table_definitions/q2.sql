@@ -57,7 +57,7 @@ SELECT party_id, count(*) as wonElections, country_id
 FROM winningParties JOIN party ON winningParties.party_id = party.id 
 GROUP BY party_id, country_id;
 
--- Average number of wins for each country.
+-- Average number of wins for each country based on the number of wins over the number of elections.
 CREATE VIEW averagePerCountry AS
 SELECT party.country_id, (cast(sum(wonElections) as decimal) / count(*)) as avg
 FROM party LEFT JOIN winnerCount ON party.id = party_id

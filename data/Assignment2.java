@@ -55,48 +55,51 @@ public class Assignment2 extends JDBCSubmission {
 	CountryId.next();
 	int countryId = CountryId.getInt("id");
 	
-	
-	String queryElectionSequence = "SELECT e.election_id, cabinet.id as cabinet_id FROM (SELECT e1.e_date as e_start, " +
-	"e2.e_date as e_end, e1.id as election_id, e1.country_id as country_id  FROM election e1, election e2 WHERE " + 
-	"e1.country_id = e2.country_id AND (e1.e_type = e2.e_type AND e2.e_date = (SELECT min(e3.e_date) FROM election " +
-	"AS e3 WHERE e3.e_date > e1.e_date AND e3.country_id = e1.country_id GROUP BY e1.country_id)) OR (e1.e_date IN (SELECT max(e3.e_date) " + 
-	"FROM election e3 WHERE e3.e_type = 'Parliamentary election' GROUP BY e3.country_id) AND e2.e_date=e1.e_date) OR " + 
-	"(e1.e_date IN (SELECT max(e3.e_date) FROM election e3 WHERE e3.e_type = 'European Parliament' GROUP BY e3.country_id) " + 
-	"AND e2.e_date = e1.e_date)) AS e JOIN cabinet ON cabinet.country_id=e.country_id AND ((e.e_start <= cabinet.start_date " +
-	"AND cabinet.start_date < e.e_end) OR (e.e_start=e.e_end AND e.e_start <= cabinet.start_date)) WHERE e.country_id = ? ORDER " +
-	"BY e.e_start desc, cabinet.start_date asc;";
-
-        /*"(SELECT cabinet.id as cabinet_id, election as election_id FROM " +
-	"(SELECT e2.id as election, e1.id as next, e2.e_date as s_date, e1.e_date as end_date, e1.country_id as c_id, e1.e_type as e_type " + 
-	"FROM election e1 JOIN election e2 ON e1.e_type = e2.e_type AND ((e2.id = e1.previous_parliament_election_id ) OR (e2.id = e1.previous_ep_election_id)) AND e1.country_id = e2.country_id WHERE e2.country_id = ?) AS election_cabinets " +
-"JOIN cabinet ON election_cabinets.c_id = cabinet.country_id " +
-"WHERE election_cabinets.s_date <= cabinet.start_date " + 
-"AND election_cabinets.end_date >= cabinet.start_date) " +
-
-/*"UNION " +
-
-"(SELECT cabinet.id as cabinet_id, election.id as election_id " +
-"FROM election JOIN cabinet ON election.country_id = cabinet.country_id AND election.country_id = ? " +
-"WHERE ( " + 
-"election.e_date IN " +
-	"(SELECT max(e_date) as e_date " +
-	"FROM election " + 
-	"WHERE election.country_id = ? " +
-	"GROUP BY (e_type))) " +
-"AND (election.e_date <= cabinet.start_date)) " +
-
-"ORDER BY election_id DESC;";*/
+	/* This query returns 2 columns election id and cabinet id where the cabinet id's
+	date falls in between the start date of election id and the end date of election id.
+	* We first find the ranges of each election to the next of its same type in order to 
+    use the start date.
+	* We then find all the cabinets that have a start date greater than   	
+	or equal to the start date of this election, and less than the end date. 
+	* If an election is the most recent one and has no end date, we only include the
+	combination of it with cabinets that started after the start date of this most recents
+	election(s).
+	*/
+	String queryElectionSequence = "SELECT e.election_id, cabinet.id as cabinet_id " +
+		"FROM (SELECT e1.e_date as e_start, e2.e_date as e_end, e1.id as election_id, " +
+			"e1.country_id as country_id  FROM election e1, election e2 " +
+				"WHERE e1.country_id = e2.country_id AND (e1.e_type = e2.e_type AND e2.e_date = " +
+					"(SELECT min(e3.e_date) " +
+						"FROM election AS e3 " +  
+							"WHERE e3.e_date > e1.e_date AND e3.country_id = e1.country_id " + 
+								"GROUP BY e1.country_id)) " + 
+					"OR (e1.e_date IN" +  
+						"(SELECT max(e3.e_date) " +
+							"FROM election e3 " + 
+								"WHERE e3.e_type = 'Parliamentary election' " +
+									"GROUP BY e3.country_id) " + 
+						"AND e2.e_date=e1.e_date) " + 
+					"OR (e1.e_date IN " + 
+						"(SELECT max(e3.e_date) " + 
+							"FROM election e3 " +
+								"WHERE e3.e_type = 'European Parliament' " + 
+									"GROUP BY e3.country_id) " + 
+					"AND e2.e_date = e1.e_date)) AS e " + 
+		"JOIN cabinet ON cabinet.country_id=e.country_id " + 
+			"AND ((e.e_start <= cabinet.start_date AND cabinet.start_date < e.e_end) " + 
+			"OR (e.e_start=e.e_end AND e.e_start <= cabinet.start_date)) " + 
+			"WHERE e.country_id = ? " + 
+			"ORDER BY e.e_start desc, cabinet.start_date asc;";
 
 	PreparedStatement getElectionSequence = connection.prepareStatement(queryElectionSequence);
 	getElectionSequence.setInt(1,countryId);
-	//getElectionSequence.setInt(2,countryId);
-	//getElectionSequence.setInt(3,countryId);
 
 	ResultSet election_sequence = getElectionSequence.executeQuery();
 	
 	List<Integer> elections = new ArrayList<Integer>();
 	List<Integer> cabinets = new ArrayList<Integer>();
-
+	
+	// Retrieve the tuples from the election sequence query
 	while(election_sequence.next()) {
 		elections.add(election_sequence.getInt("election_id") );
 		cabinets.add(election_sequence.getInt("cabinet_id"));
@@ -114,18 +117,20 @@ public class Assignment2 extends JDBCSubmission {
     public List<Integer> findSimilarPoliticians(Integer politicianId, Float threshold) {
     	
 		try {
+		    // Retrieve the comment and description of the input politician that we are comparing against.
 			String queryMainPolitician = "SELECT id, description, comment FROM politician_president WHERE id = ?";
 			PreparedStatement getMainPolitician = connection.prepareStatement(queryMainPolitician);
 			getMainPolitician.setInt(1, politicianId);
 			ResultSet politicianInfo = getMainPolitician.executeQuery();
 			
+			// Store the extracted information into structure for use in the following query
 			politicianInfo.next();
 			String politicianDescription = politicianInfo.getString("description");
 			String politicianComment = politicianInfo.getString("comment");
 			String politicianAll = politicianDescription + " " + politicianComment;
 			
-			//System.out.println("politian all: " + politicianAll);
-
+			
+			// Get all the politicians, comments, and descriptions of those other than the input politicianId
 			String queryOtherPoliticians = "SELECT id, description, comment FROM politician_president WHERE id != ?";
 			PreparedStatement getOtherPoliticians = connection.prepareStatement(queryOtherPoliticians);
 			getOtherPoliticians.setInt(1, politicianId);
@@ -133,14 +138,13 @@ public class Assignment2 extends JDBCSubmission {
 			
 			List<Integer> similarPoliticians = new ArrayList<Integer>();
 
-	  
+	 		//Compare the similarity of each politician's comments and descriptions to the input one
+			// Only include politicians whose similarity exceeds the given threshold.
 			while(otherPoliticianInfo.next()){
-				//System.out.println(otherPoliticianInfo.getInt("id"));
 				String otherPoliticianDescription = otherPoliticianInfo.getString("description");
 				String otherPoliticianComment = otherPoliticianInfo.getString("comment");
 				String otherPoliticianAll = otherPoliticianDescription + " " + otherPoliticianComment;
 				if (similarity(politicianDescription, otherPoliticianAll) > threshold){
-					//System.out.println("Truth be told.");
 					similarPoliticians.add(otherPoliticianInfo.getInt("id"));
 				}
 			}
@@ -154,26 +158,7 @@ public class Assignment2 extends JDBCSubmission {
     }
 
     public static void main(String[] args) {
-        // You can put testing code in here. It will not affect our autotester.
-
-		try {
-			
-			Assignment2 test = new Assignment2();
-			test.connectDB("jdbc:postgresql://localhost:5432/csc343h-assihis1?currentSchema=parlgov",
-					"assihis1", "");
-
-			List<Integer> similarPoliticians = test.findSimilarPoliticians(148, (float) 0.01);
-			ElectionCabinetResult election_result = test.electionSequence("Canada");
-			System.out.println(election_result.elections  + "size: " + election_result.elections.size());
-			System.out.println(election_result.cabinets);
-			System.out.println(similarPoliticians);
-		}
-
-		catch (ClassNotFoundException se) {
-			System.err.println("SQL Exception." +
-					"<Message>: " + se.getMessage());
-		}
-    
+   
     }
 
 }

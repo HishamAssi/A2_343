@@ -11,7 +11,7 @@ countryName VARCHAR(50),
 voteRange VARCHAR(20),
 partyName VARCHAR(100)
 );
--- NO NULLS!!!
+
 -- Dropping the views that I'm about to create first just in case
 DROP VIEW IF EXISTS past_20 CASCADE;
 DROP VIEW IF EXISTS party_votes_ratios CASCADE;
@@ -29,15 +29,14 @@ SELECT EXTRACT(YEAR FROM e_date) as year, election.id as e_id, country_id, party
 FROM election JOIN election_result ON election.id=election_id 
 WHERE 1996 <= EXTRACT(YEAR FROM e_date) AND EXTRACT(YEAR FROM e_date) <= 2016;
 
--- TODO: check why the number of null values increases from past_20 to party_votes_ratios by 62.
--- TODO: double check the average done in the 2nd view.
 
--- Get ratios.
+-- The percentage participation of a party in a single election.
 CREATE VIEW party_votes_ratios AS 
 SELECT year, country.name as countryName, (cast(votes as decimal) / cast(votes_valid as decimal))*100 as voteRatio, party.name_short as partyName
 FROM past_20 JOIN country ON country.id=country_id JOIN party ON party.id=party_id;
 
 -- Average the ratios if more than one election occured in a year.
+-- The final table will have the percentage participation of a party in a single year. 
 CREATE VIEW avg_party_votes_ratios AS
 SELECT year, countryName, sum(voteRatio) / cast(count(*) as decimal) as voteRatio, partyName
 FROM party_votes_ratios
@@ -46,6 +45,7 @@ GROUP BY year, partyName, countryName;
 
 -- For the next 6 views, I will be creating a different view for the different 
 -- ranges to include the ranges in the views.
+
 -- This view is for the range of 0 exclusive to 5 inclusive.
 CREATE VIEW from0_5 AS 
 SELECT year, countryName, cast('(0-5]' as VARCHAR(20)) as voteRange, partyName
@@ -85,13 +85,7 @@ SELECT year, countryName, cast('(40-100]' as VARCHAR(20))  as voteRange, partyNa
 FROM avg_party_votes_ratios
 WHERE 40 < voteRatio;
 
--- This view consists of all the parties that did not have a voteRange.
-CREATE VIEW null_parties AS 
-SELECT year, countryName, NULL  as voteRange, partyName
-FROM avg_party_votes_ratios
-WHERE voteRatio IS null;
-
--- TODO :  null VOTES?
+-- We will not be including parties with NULL votes (as discussed witj Prof Sina at Office Hours)  
 
 -- Combining all the ranges together.
 CREATE VIEW allRanges AS
@@ -101,8 +95,7 @@ SELECT * FROM (
 (SELECT * FROM from10_20) UNION
 (SELECT * FROM from20_30) UNION
 (SELECT * FROM from30_40) UNION
-(SELECT * FROM from40) UNION
-(SELECT * FROM null_parties)) AS from0_100;
+(SELECT * FROM from40)) AS from0_100;
 
 -- the answer to the query
 insert into q1 (SELECT * FROM allRanges);
